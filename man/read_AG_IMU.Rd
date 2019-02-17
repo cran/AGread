@@ -5,7 +5,8 @@
 \title{File reading function for IMU files}
 \usage{
 read_AG_IMU(file, output_window_secs = 1, verbose = FALSE, skip = 10,
-  filter = TRUE, filter_hz = 35)
+  filter = TRUE, filter_hz = 35, output_vars = c("accelerometer",
+  "temperature", "gyroscope", "magnetometer"))
 }
 \arguments{
 \item{file}{character scalar giving the path to the IMU file}
@@ -19,6 +20,8 @@ read_AG_IMU(file, output_window_secs = 1, verbose = FALSE, skip = 10,
 \item{filter}{a logical scalar: Apply a low-pass filter to gyroscope data?}
 
 \item{filter_hz}{The cutoff for the low-pass filter}
+
+\item{output_vars}{character. IMU variables to include in output.}
 }
 \value{
 A dataframe giving processed IMU data in the specified epoch length
@@ -27,10 +30,11 @@ A dataframe giving processed IMU data in the specified epoch length
 File reading function for IMU files
 }
 \examples{
-imu_file <-
-    system.file("extdata",
-        "TestID_LeftWrist_IMU.csv",
-        package = "AGread")
+imu_file <- system.file(
+  "extdata",
+  "example-IMU.csv",
+  package = "AGread"
+)
 
 read_AG_IMU(imu_file)
 
