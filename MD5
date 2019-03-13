@@ -1,7 +1,7 @@
-0fcb345ebd54fef7472a0528bab10c72 *DESCRIPTION
-3ec31ee2f644ced3a6317f5ba41a58e4 *LICENSE
+abd76697ab9067aeef1ecfb3cec066ff *DESCRIPTION
+1aa111c4afb095fb3c5862e3ce57f836 *LICENSE
 fbfc7102ea1a7769a41261636c84427b *NAMESPACE
-159fdc6c778449220ae2c456eafd88b0 *NEWS.md
+45dc3cd84d2efc175dcc310415c65416 *NEWS.md
 9819b2a22bb6680def1a85c0ae2a77e0 *R/AGread.R
 974b6a0f0748e4cb141b9c972f71d237 *R/Data.R
 22b7f0936425fc3eff31e76a77fa1347 *R/Dates&Times.R
@@ -30,7 +30,7 @@ c9dd8624900917eccbca12a757bbb2dd *R/Utils_headers.R
 4c08ff9b9879dd83669e56eb4b404df4 *R/checksum_calculate.R
 a53c67c4535c7349ae31748fdae6cb92 *R/collapse_gt3x.R
 553439a93fe65ccf58cdbcaff29b5983 *R/file_size.R
-c37ff88073c13bc70ce87a7a65b0580a *R/get_record_header.R
+bb4116a89678304cbcfe33d5fc357cf3 *R/get_record_header.R
 f97700946753857b8cfa9a634b754114 *R/parse_info_txt.R
 01f804c52106e968ee8bc50ab0a3ff2b *R/parse_log_bin.R
 68738bc44d1af1b6d5b0cec93fac516d *R/process_record_set.R
@@ -42,7 +42,7 @@ d86b838d8467fd750e390d70563e4856 *R/sysdata.rda
 0f07a0b0eccbe5d7b4b63fa4075943d7 *R/timestamp_recalc.R
 109d777536444a58904125b9636331be *R/vector_magnitude.R
 c4cf91da0561763738c34fe24470fd8a *R/zzz.R
-90d8ff3c452dd36447776cdcaed937d6 *README.md
+eaa904335d633ebb3509ca2486dee685 *README.md
 3fa5aac9c8f8a91afa3ff18b2b03ef7a *data/imu_to_check.rda
 51db3401f7a8ed2557bdabb360b0eefd *data/imu_to_collapse.rda
 3aae43a117a523592402e1c825618dc1 *data/raw_to_collapse.rda
@@ -78,7 +78,7 @@ dd17c71c7ede3b5c4210eba8da4265d0 *man/get_blocks.Rd
 bd4edb43e573ef6afc0b721b713ec2e4 *man/get_duration.Rd
 5e8eb4bbbd670ee04ba1773fff58f278 *man/get_file_size__gb.Rd
 83e6970825d41f2c35cdcb7adeb9dd2f *man/get_float_value.Rd
-ab801fabd53850dd5acdda1d432ab24c *man/get_headers.Rd
+9398c5e7de2924dddd43a212b668995b *man/get_headers.Rd
 2cfa50cf99c5c7968e75f6f108eb9836 *man/get_imu_file_meta.Rd
 b09c60cbbdac2d9ef47c76a3df79b6bb *man/get_minute.Rd
 85a79d717990875ff0ca75c5a55f75f0 *man/get_raw_file_meta.Rd
