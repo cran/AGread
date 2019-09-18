@@ -3,7 +3,6 @@
 #' @param file character. Path to the file
 #' @param tz character. The timezone to use
 #' @param verbose logical. Print updates to console?
-#' @param give_timestamp logical. Include timestamp in output?
 #' @param include character. The PACKET types to parse
 #'
 #' @return A list of processed data, with one element for each of the relevant
@@ -25,20 +24,22 @@
 #' file_3x <- system.file(
 #'   "extdata", "example.gt3x", package = "AGread"
 #' )
-#' read_gt3x(file_3x)
+#' AG_3x <- read_gt3x(file_3x)
+#' head(lapply(AG_3x, head))
 #' }
 #'
 read_gt3x <- function(
   file, tz = "UTC", verbose = FALSE,
-  give_timestamp = TRUE,
   include = c("METADATA", "PARAMETERS", "SENSOR_SCHEMA", "BATTERY", "EVENT",
   "TAG", "ACTIVITY", "HEART_RATE_BPM", "HEART_RATE_ANT", "HEART_RATE_BLE",
   "LUX", "CAPSENSE", "EPOCH", "EPOCH2", "EPOCH3", "EPOCH4", "ACTIVITY2",
   "SENSOR_DATA")
 ) {
 
-  timer <- proc.time()
-  if (verbose) cat("\nProcessing", basename(file), "\n")
+  timer <- PAutilities::manage_procedure(
+    "Start", "\nProcessing", basename(file), "\n",
+    verbose = verbose
+  )
 
   #1) Verify .gt3x file is a zip file
   file_3x <- try(
@@ -46,7 +47,7 @@ read_gt3x <- function(
     TRUE
   )
 
-  if (class(file_3x) == "try-error") {
+  if ("try-error" %in% class(file_3x)) {
     stop(paste(
       deparse(substitute(file)),
       "is not a valid gt3x file."
@@ -74,22 +75,14 @@ read_gt3x <- function(
   log_file  <- utils::unzip(file, "log.bin", exdir = tempdir())
   log  <- parse_log_bin(
     log_file, file_3x["log.bin", "Length"], info, tz,
-    verbose, give_timestamp, include
+    verbose, include
   )
 
-  if (verbose) cat(
-    "\n\nProcessing complete. Elapsed time",
-    AGread::get_duration(timer),
-    "minutes.\n"
+  PAutilities::manage_procedure(
+    "End", "\n\nProcessing complete. Elapsed time",
+    PAutilities::get_duration(timer),
+    "minutes.\n", verbose = verbose
   )
-
-  log <- name_log(log)
-  if ("RAW" %in% names(log)) {
-    class(log$RAW) <- c(class(log$RAW), "RAW")
-  }
-  if ("IMU" %in% names(log)) {
-    class(log$IMU) <- c(class(log$IMU), "IMU")
-  }
 
   return(log)
 

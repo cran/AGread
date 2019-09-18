@@ -9,27 +9,28 @@ Status](https://travis-ci.org/paulhibbing/AGread.svg?branch=master)](https://tra
 -----
 
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/AGread)](https://cran.r-project.org/package=AGread)
-[![packageversion](https://img.shields.io/badge/Package%20version-0.2.2.9000-orange.svg?style=flat-square)](commits/master)
 
 -----
-
-[![Last-changedate](https://img.shields.io/badge/last%20change-2019--03--07-yellowgreen.svg)](/commits/master)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # AGread
 
-AGread is for automatically detecting the format of .csv data files from
-ActiGraph accelerometers, and bringing the data into R. It is designed
-to streamline and standardize the file-reading process, prior to further
-processing. Thus, it can be used flexibly to develop new methods for
-handling ActiGraph data, or to invoke existing methods, many of which
-exist in other R packages (e.g.
-[PhysicalActivity](https://cran.r-project.org/package=PhysicalActivity)
+AGread is for bringing ActiGraph sensor data into R. It is designed to
+streamline and standardize the file-reading process, regardless of which
+file format is provided (currently supporting `.gt3x` and `.csv`).
+
+AGread can be used flexibly to develop new methods for handling
+ActiGraph data, or to invoke existing methods, many of which exist in
+other R packages
+(e.g. [PhysicalActivity](https://cran.r-project.org/package=PhysicalActivity)
 and [TwoRegression](https://cran.r-project.org/package=TwoRegression)),
 or will soon.
 
-New in AGread 0.2.2, binary .gt3x files can be read in as well.
+New in AGread 1.0.0, `Rcpp` has been invoked to speed up the process of
+reading `.gt3x` files. There is now documented equivalence between the
+outcomes of `read_gt3x` and csv reading functions `read_AG__raw` and
+`read_AG_IMU`.
 
 ## Installation
 
@@ -40,7 +41,11 @@ You can install the development version of AGread from github with:
 devtools::install_github("paulhibbing/AGread")
 ```
 
-Or, AGread v0.2.2 is now available on CRAN, and can be installed with:
+Windows users, make sure you have
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) installed
+before running the above.
+
+Alternatively, AGread v1.0.0 is available on CRAN. Install it with:
 
 ``` r
 install.packages("AGread")

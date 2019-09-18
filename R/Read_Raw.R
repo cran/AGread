@@ -16,11 +16,16 @@
 #' @examples
 #' raw_file <- system.file(
 #'   "extdata",
-#'   "TestID_LeftWrist_RAW.csv",
+#'   "exampleRAW.csv",
 #'   package = "AGread"
 #' )
 #'
-#' read_AG_raw(raw_file)
+#' ## suppress messages that indicate truncation when sampling
+#' ## rate and output window don't line up
+#' AG_RAW <- suppressMessages(
+#'   read_AG_raw(raw_file)
+#' )
+#' head(AG_RAW)
 #'
 #' @export
 read_AG_raw <- function(file, output_window_secs = 1,
@@ -74,24 +79,36 @@ read_AG_raw <- function(file, output_window_secs = 1,
       AG$file_source_PrimaryAccel <- basename(file)
       AG$date_processed_PrimaryAccel <- Sys.time()
 
-      AG$day_of_year <- get_day_of_year(
-        AG$Timestamp,
-        format = "%Y-%m-%d %H:%M:%S"
-      )
-      AG$minute_of_day <- get_minute(
-        AG$Timestamp,
-        format = "%Y-%m-%d %H:%M:%S"
-      )
+      # AG$day_of_year <- get_day_of_year(
+      #   AG$Timestamp,
+      #   format = "%Y-%m-%d %H:%M:%S"
+      # )
+      # AG$minute_of_day <- get_minute(
+      #   AG$Timestamp,
+      #   format = "%Y-%m-%d %H:%M:%S"
+      # )
 
-      order <-
-        c("file_source_PrimaryAccel",
-          "date_processed_PrimaryAccel",
-          "Timestamp",
-          "day_of_year",
-          "minute_of_day")
-      AG <- AG[, c(order, setdiff(names(AG), order))]
+      ordered_names <- c(
+        "file_source_PrimaryAccel",
+        "date_processed_PrimaryAccel",
+        "Timestamp"#,
+        # "day_of_year",
+        # "minute_of_day"
+      )
+      ordered_names <- c(
+        ordered_names,
+        setdiff(names(AG), ordered_names)
+      )
+      AG <- AG[, ordered_names]
+      AG <- data.frame(
+        AG, stringsAsFactors = FALSE,
+        row.names = NULL
+      )
+      names(AG) <- gsub("\\.", "_", names(AG))
 
-      if (verbose) message_update(16, dur = get_duration(timer))
+      if (verbose) message_update(
+        16, dur = PAutilities::get_duration(timer)
+      )
       return(AG)
     }
 
@@ -102,7 +119,9 @@ read_AG_raw <- function(file, output_window_secs = 1,
   AG$file_source_PrimaryAccel <- basename(file)
   AG <- ag_raw_format(AG, meta$start, output_window_secs)
 
-  if (verbose) message_update(16, dur = get_duration(timer))
+  if (verbose) message_update(
+    16, dur = PAutilities::get_duration(timer)
+  )
 
   return(AG)
 }
