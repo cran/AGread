@@ -45,10 +45,10 @@ validate_include <- function(
 #'
 get_headers <- function(log, tz = "UTC", verbose = FALSE) {
 
-  if (verbose) cat("\n  Getting record headers")
-
-  record_headers <- get_headersC(log)
+  if (verbose) cat("\n")
+  record_headers <- get_headersC(log, verbose)
   record_headers$index <- record_headers$index + 1
+
   record_headers$type  <- as.character(record_headers$type)
   record_headers$timestamp <- anytime::anytime(
     record_headers$timestamp, tz
@@ -61,7 +61,10 @@ get_headers <- function(log, tz = "UTC", verbose = FALSE) {
     )
   )
 
-  if (verbose) cat("............... COMPLETE")
+  if (verbose) cat(
+    "\r  Getting record headers",
+    " ............... COMPLETE"
+  )
 
   return(record_headers)
 
@@ -195,7 +198,7 @@ setup_payload <- function(record_header, log) {
   stopifnot(length(payload) == record_header$payload_size)
 
   checksumC(
-    log, log_indices[1], log_indices[length(log_indices)]
+    log, log_indices[1] - 1, log_indices[length(log_indices)] - 1
   )
 
   payload

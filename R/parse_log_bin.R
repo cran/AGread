@@ -19,19 +19,23 @@ parse_log_bin <- function(
 ) {
 
   ## Validate the input to `include`
+
     include <- validate_include(include, verbose)
 
   ## Read the bin file
+
     if (verbose) cat("\n  Reading log.bin")
-      log <- readBin(log_file, "raw", file_3x_len)
+    log <- readBin(log_file, "raw", file_3x_len)
     if (verbose) cat("  ............. COMPLETE")
 
   ## Get headers
+
     record_headers <- get_headers(log, tz, verbose)
     record_headers <- sort_records(record_headers)
     record_headers <- select_records(record_headers, include)
 
   ## Get parameters (if applicable)
+
     if ("PARAMETERS" %in% names(record_headers)) {
       parameters <- parse_packet_set(
         record_headers$PARAMETERS, log,
@@ -43,15 +47,31 @@ parse_log_bin <- function(
     }
 
   ## Get schema (if applicable)
+
     if ("SENSOR_SCHEMA" %in% names(record_headers)) {
       schema <- parse_packet_set(
-        record_headers$SENSOR_SCHEMA, log, tz,
-        verbose
+        record_headers$SENSOR_SCHEMA, log,
+        tz, verbose
       )
       record_headers$SENSOR_SCHEMA <- NULL
     } else {
       schema <- NULL
     }
+
+  ## Get events (if applicable)
+
+    if (!"EVENT" %in% names(record_headers)) {
+      events <- parse_packet_set(
+        structure(list(), class = "EVENT"),
+        log, tz, verbose
+      )
+    } else {
+      events <- parse_packet_set(
+        record_headers$EVENT,
+        log, tz, verbose, info = info
+      )
+    }
+    record_headers$EVENT <- NULL
 
   ## Now process the remaining packets
 
@@ -60,8 +80,8 @@ parse_log_bin <- function(
       parse_packet_set,
       log = log, tz = tz,
       verbose = verbose, info = info,
-      parameters = parameters, schema = schema
-
+      parameters = parameters, schema = schema,
+      events = events
     )
 
     if(all("PARAMETERS" %in% include, exists("parameters"))) {
@@ -69,6 +89,9 @@ parse_log_bin <- function(
     }
     if(all("SENSOR_SCHEMA" %in% include, exists("schema"))) {
       results$SENSOR_SCHEMA <- schema
+    }
+    if(all("EVENT" %in% include, exists("events"))) {
+      results$EVENT <- events
     }
 
     new_names <- sapply(results, function(x) class(x)[1])

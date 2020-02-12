@@ -2,9 +2,9 @@
 #define IMU_PAYLOAD_H
 
 #include <Rcpp.h>
-Rcpp::List payload_parse_sensor_data_25C(
+Rcpp::DataFrame payload_parse_sensor_data_25C(
     Rcpp::RawVector payload, Rcpp::DataFrame info,
-    int id, int samp_rate
+    int id, int samp_rate, Rcpp::Datetime timestamp
 );
 
 #endif

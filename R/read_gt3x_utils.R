@@ -1,3 +1,66 @@
+.accel_names <- c("Accelerometer_X", "Accelerometer_Y", "Accelerometer_Z")
+.gyro_names <- c("Gyroscope_X", "Gyroscope_Y", "Gyroscope_Z")
+.mag_names <- c("Magnetometer_X", "Magnetometer_Y", "Magnetometer_Z")
+
+#' Construct missing packet entries for ACTIVITY2 (RAW) data
+#'
+#' @param timestamps the packet timestamps
+#' @param empty_value the value to assign missing accelerometer entries
+#' @param info output of \code{\link{parse_info_txt}}
+#' @param empty_frame optional data frame of values to pass for accelerometer
+#'   axes (used for latching)
+#'
+#' @keywords internal
+empty_raw <- function(
+  timestamps, empty_value = NA, info, empty_frame = NULL
+) {
+
+  if (!length(timestamps)) {
+    return(structure(
+      list(
+        Timestamp = structure(
+          numeric(0),
+          class = c("POSIXct", "POSIXt")
+        ),
+        Accelerometer_X = numeric(0),
+        Accelerometer_Y = numeric(0),
+        Accelerometer_Z = numeric(0)
+      ),
+      row.names = integer(0),
+      class = "data.frame"
+    ))
+  }
+
+  milliseconds <- seq(info$Sample_Rate) - 1
+  milliseconds <- milliseconds / info$Sample_Rate
+
+  missing_times <- sapply(
+    timestamps, function(x) x + milliseconds,
+    simplify = FALSE
+  ) %>% {do.call(c, .)}
+
+  if (is.null(empty_frame)) {
+
+    missing_entries <- data.frame(
+      Timestamp = missing_times,
+      Accelerometer_X = empty_value,
+      Accelerometer_Y = empty_value,
+      Accelerometer_Z = empty_value
+    )
+
+  } else {
+
+    missing_entries <- data.frame(
+      Timestamp = missing_times,
+      empty_frame, row.names = NULL
+    )
+
+  }
+
+  missing_entries
+
+}
+
 #' Convert a tick value to a timestamp
 #'
 #' @param x the tick value
@@ -11,25 +74,6 @@ tick_to_posix <- function(x, tz = "UTC", ...) {
   x <- as.numeric(as.character(x)) / 10000000
 
   as.POSIXct(x, tz, origin = "0001-01-01", ...)
-
-}
-
-#' Function to round away from zero
-#'
-#' @param x the value to round
-#' @param digits digits to round to
-#'
-#' @keywords internal
-#'
-AG_round <- function(x, digits = 6) {
-  # x <- c(7.5555555, -7.5555555)
-  # digits <- 6
-
-  signs <- sign(x)
-
-  DescTools::RoundTo(
-    abs(x), 5 / (10 ^ digits), "ceiling"
-  ) * signs
 
 }
 
