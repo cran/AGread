@@ -1,7 +1,7 @@
-96fd81730b01051bee38cfc7b1c4e731 *DESCRIPTION
+47d1c3ddfe7f1ef1ffbbc1c9b6fffea3 *DESCRIPTION
 1aa111c4afb095fb3c5862e3ce57f836 *LICENSE
 fd8e0079411f4aae50fe46ac36de12dc *NAMESPACE
-e6de11644d02842c62612550bc6750b7 *NEWS.md
+6159d434ac184366e51526eeb7a3f0e0 *NEWS.md
 aca97c43aff62acc150e0762fef3ebfa *R/AG_insert.R
 f45e08b44835335d1b47abd6ba9d6062 *R/AG_merge.R
 2aec7e57ed71bad8dfda332f1bbcbfe2 *R/AGread-deprecated.R
@@ -158,7 +158,7 @@ e8234c7280371bd74b878d6395d7583d *man/update_key.Rd
 1c09a1be790454ecd9348e663087859a *src/get_headersC.cpp
 74e30025eeee9af36926011185a69c69 *src/get_latch.cpp
 35a2e8e3af5bbc763d2a70e847ca887e *src/get_times.cpp
-19f521c7bbd6f191757f0c8eb1ff16a1 *src/helpers.cpp
+2f20e6fd258cfb14aacf76730711a859 *src/helpers.cpp
 5047202d171efb931918da3abc790478 *src/helpers.h
 c28d61e3dc2cfa9054d7888f093f2b6c *src/impute_C.cpp
 3b160b265d2d13e3d9a032fc625a24aa *src/imu_payload.h
