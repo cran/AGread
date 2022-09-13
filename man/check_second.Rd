@@ -9,6 +9,10 @@ check_second(AG)
 \arguments{
 \item{AG}{a dataframe of IMU data}
 }
+\value{
+A (possibly shortened) version of the input data frame, which starts
+  on the first sample of the first full second of data
+}
 \description{
 Check if the IMU data start on an exact second
 }

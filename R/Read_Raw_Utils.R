@@ -6,7 +6,12 @@
 #'
 #' @inheritParams read_AG_raw
 #' @inheritParams read_AG_counts
+#' @param skip number of lines to skip when reading \code{file}
 #' @param ... Arguments passed to \code{\link{read.csv}}
+#'
+#' @return a logical scalar indicating whether there was only one column
+#'   detected when reading the file
+#'
 #' @examples
 #' raw_file <-
 #'     system.file("extdata",
@@ -25,6 +30,8 @@ check_columns <- function(file, skip, ...) {
 #' Get file metadata (sampling frequency and timestamps) for primary accelerometer
 #'
 #' @param file character scalar giving path to primary accelerometer file
+#'
+#' @return A list of metadata information
 #'
 #' @examples
 #' raw_file <-
@@ -141,6 +148,8 @@ ag_raw_format <- function(
 #'   either "default" or "block"
 #' @param ENMO2 vector of leftover raw values from the previous block (if
 #'   applicable)
+#'
+#' @return A data frame of collapsed acceleration summaries
 #'
 #' @examples
 #' data(raw_to_collapse)

@@ -9,6 +9,9 @@ get_raw_file_meta(file)
 \arguments{
 \item{file}{character scalar giving path to primary accelerometer file}
 }
+\value{
+A list of metadata information
+}
 \description{
 Get file metadata (sampling frequency and timestamps) for primary accelerometer
 }

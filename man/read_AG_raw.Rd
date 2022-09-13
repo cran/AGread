@@ -4,8 +4,15 @@
 \alias{read_AG_raw}
 \title{File reading function for primary accelerometer files}
 \usage{
-read_AG_raw(file, output_window_secs = 1, calibrate = FALSE,
-  verbose = FALSE, skip = 10, block = FALSE, return_raw = FALSE, ...)
+read_AG_raw(
+  file,
+  output_window_secs = 1,
+  calibrate = FALSE,
+  verbose = FALSE,
+  block = FALSE,
+  return_raw = FALSE,
+  ...
+)
 }
 \arguments{
 \item{file}{A character scalar giving path to primary accelerometer file}
@@ -15,8 +22,6 @@ read_AG_raw(file, output_window_secs = 1, calibrate = FALSE,
 \item{calibrate}{logical. Perform autocalibration using \link[GGIR]{g.calibrate}}
 
 \item{verbose}{A logical scalar: Print processing updates?}
-
-\item{skip}{Header length: Number of rows to skip when reading the file}
 
 \item{block}{logical. Should file be read in blocks? Will be automatically
 invoked if file is larger than 2 GB.}

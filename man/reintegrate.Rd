@@ -2,19 +2,39 @@
 % Please edit documentation in R/Reintegrate.R
 \name{reintegrate}
 \alias{reintegrate}
-\title{Reintegrate a data stream}
+\alias{reintegrate_legacy}
+\title{Reintegrate ActiGraph data}
 \usage{
-reintegrate(ag, to, time_var = "Timestamp", direction = c("forwards",
-  "backwards"), verbose = FALSE)
+reintegrate(
+  ag,
+  target_sec,
+  time_var = "Timestamp",
+  method = c("tidy", "legacy"),
+  ...
+)
+
+reintegrate_legacy(
+  ag,
+  target_sec,
+  time_var = "Timestamp",
+  direction = c("forwards", "backwards"),
+  verbose = FALSE
+)
 }
 \arguments{
-\item{ag}{A data frame to reintegrate}
+\item{ag}{a data frame to reintegrate}
 
-\item{to}{The epoch length desired. Starting epoch length will be determined
-automatically.}
+\item{target_sec}{the desired epoch length of the output. Starting epoch
+length will be determined automatically}
 
 \item{time_var}{The name of the column containing POSIX-formatted timestamp
 information}
+
+\item{method}{character scalar indicating the desired method of
+reintegration. Options are \code{tidy} (the default) and \code{legacy}. See
+details}
+
+\item{...}{arguments passed to \code{reintegrate_legacy}}
 
 \item{direction}{The direction of reintegration, i.e. whether a timestamp
 refers to the timespan after the previous data point ("backwards"), or
@@ -22,44 +42,41 @@ before the next data point ("forwards").}
 
 \item{verbose}{logical. Print updates to console?}
 }
+\value{
+A data frame of reintegrated activity count data
+}
 \description{
-Reintegrate a data stream
+Reintegrate ActiGraph data
+}
+\details{
+Two methods are provided. One is a legacy method that allows "forward" or
+"backward" reintegration, depending on whether the timestamp occurs
+(respectively) at the start of the interval (typical for activity monitors)
+or the end (typical for indirect calorimeters). The other is a \code{tidy}
+approach, which is both more straightforward and more concise. However,
+runtime implications are uncertain, and only forward reintegration is
+supported (consistent with 'ActiLife' precedent).
 }
 \examples{
 
-data("imu_to_check", package = "AGread")
-ag <-
-  imu_to_check[ ,c("Timestamp", "mean_abs_Gyroscope_x_DegPerS")]
+test_file <- system.file(
+  "extdata", "example1sec.csv", package = "AGread"
+)
 
-# Forwards reintegration
-  reintegrate(
+ag <- read_AG_counts(test_file, header = TRUE)
+
+# Old Method:
+
+  old_result <- reintegrate(
     ag = ag,
-    to = 60,
+    target_sec = 60,
     time_var = "Timestamp",
+    method = "legacy",
     direction = c("forwards")
   )
 
-# Backwards reintegration
-  reintegrate(
-    ag = ag,
-    to = 60,
-    time_var = "Timestamp",
-    direction = c("backwards")
-  )
-\dontrun{
-# Erronious usages that will give a warning
-  reintegrate(
-    ag = ag,
-    to = 60,
-    time_var = "Timestamp",
-    direction = c("forwards", "backwards")
-  )
+# New Method:
 
-  reintegrate(
-    ag = ag,
-    to = 60,
-    time_var = "Timestamp"
-  )
-}
+  new_result <- reintegrate(ag, 60)
 
 }

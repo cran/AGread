@@ -2,6 +2,9 @@
 #'
 #' @param AG a dataframe of IMU data
 #'
+#' @return A (possibly shortened) version of the input data frame, which starts
+#'   on the first sample of the first full second of data
+#'
 #' @examples
 #' data(imu_to_check)
 #' sec_check <- check_second(imu_to_check)
@@ -23,6 +26,8 @@ check_second <- function(AG) {
 #' @param file character scalar giving path to IMU file
 #' @param output_window_secs the desired epoch length, over which to average IMU
 #'   data
+#'
+#' @return a list of metadata information
 #'
 #' @examples
 #' imu_file <-

@@ -4,8 +4,13 @@
 \alias{read_AG_counts}
 \title{Read data table files containing count values}
 \usage{
-read_AG_counts(file, verbose = FALSE, skip = 10, nrows = 10,
-  header = FALSE, ...)
+read_AG_counts(
+  file,
+  verbose = FALSE,
+  header = FALSE,
+  header_timestamp_format = "\%m/\%d/\%Y \%H:\%M:\%S",
+  ...
+)
 }
 \arguments{
 \item{file}{A character scalar giving path to an automatically-generated csv
@@ -13,14 +18,13 @@ file with count values}
 
 \item{verbose}{A logical scalar: Print processing updates?}
 
-\item{skip}{Header length: Number of rows to skip when reading the file}
-
-\item{nrows}{Header length: Number of rows to read when retrieving meta-data}
-
 \item{header}{A logical scalar: Are variable names contained in first row of
 file?}
 
-\item{...}{Further arguments passed to \code{read.csv} and \code{fread}}
+\item{header_timestamp_format}{character. Space delimited format of the date
+and time in the file header (default is \code{\%m/\%d/\%Y \%H:\%M:\%S})}
+
+\item{...}{Further arguments passed to \code{data.table::fread}}
 }
 \value{
 A data frame reflecting the data contained in the csv file
@@ -35,7 +39,7 @@ AG_counts <- read_AG_counts(
     "example1sec.csv",
     package = "AGread"
   ),
-  skip = 11
+  header = TRUE
 )
 head(AG_counts)
 

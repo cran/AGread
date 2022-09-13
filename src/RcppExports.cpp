@@ -5,6 +5,67 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
+// get_int12
+signed short get_int12(RawVector x, int i1, int i2, bool full_first);
+RcppExport SEXP _AGread_get_int12(SEXP xSEXP, SEXP i1SEXP, SEXP i2SEXP, SEXP full_firstSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RawVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type i1(i1SEXP);
+    Rcpp::traits::input_parameter< int >::type i2(i2SEXP);
+    Rcpp::traits::input_parameter< bool >::type full_first(full_firstSEXP);
+    rcpp_result_gen = Rcpp::wrap(get_int12(x, i1, i2, full_first));
+    return rcpp_result_gen;
+END_RCPP
+}
+// activity_payload
+DataFrame activity_payload(RawVector payload, int samp_rate, int scale_factor, bool is_last_packet);
+RcppExport SEXP _AGread_activity_payload(SEXP payloadSEXP, SEXP samp_rateSEXP, SEXP scale_factorSEXP, SEXP is_last_packetSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RawVector >::type payload(payloadSEXP);
+    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
+    Rcpp::traits::input_parameter< int >::type scale_factor(scale_factorSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_last_packet(is_last_packetSEXP);
+    rcpp_result_gen = Rcpp::wrap(activity_payload(payload, samp_rate, scale_factor, is_last_packet));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dev_parse_activity
+List dev_parse_activity(List packets, IntegerVector packet_no, List zero_packet, int samp_rate, int scale_factor);
+RcppExport SEXP _AGread_dev_parse_activity(SEXP packetsSEXP, SEXP packet_noSEXP, SEXP zero_packetSEXP, SEXP samp_rateSEXP, SEXP scale_factorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type packets(packetsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type packet_no(packet_noSEXP);
+    Rcpp::traits::input_parameter< List >::type zero_packet(zero_packetSEXP);
+    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
+    Rcpp::traits::input_parameter< int >::type scale_factor(scale_factorSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev_parse_activity(packets, packet_no, zero_packet, samp_rate, scale_factor));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dev1_bin_initialize
+List dev1_bin_initialize(RawVector log, bool verbose, IntegerVector include);
+RcppExport SEXP _AGread_dev1_bin_initialize(SEXP logSEXP, SEXP verboseSEXP, SEXP includeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RawVector >::type log(logSEXP);
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type include(includeSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev1_bin_initialize(log, verbose, include));
+    return rcpp_result_gen;
+END_RCPP
+}
 // get_VM_C
 NumericVector get_VM_C(NumericVector x, NumericVector y, NumericVector z);
 RcppExport SEXP _AGread_get_VM_C(SEXP xSEXP, SEXP ySEXP, SEXP zSEXP) {
@@ -18,15 +79,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// next_separator
-int next_separator(RawVector log, int index);
-RcppExport SEXP _AGread_next_separator(SEXP logSEXP, SEXP indexSEXP) {
+// type3
+List type3(RawVector log, bool verbose);
+RcppExport SEXP _AGread_type3(SEXP logSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RawVector >::type log(logSEXP);
-    Rcpp::traits::input_parameter< int >::type index(indexSEXP);
-    rcpp_result_gen = Rcpp::wrap(next_separator(log, index));
+    Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
+    rcpp_result_gen = Rcpp::wrap(type3(log, verbose));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -110,16 +171,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// get_times
-DatetimeVector get_times(Datetime start, Datetime end, int samp_rate);
-RcppExport SEXP _AGread_get_times(SEXP startSEXP, SEXP endSEXP, SEXP samp_rateSEXP) {
+// next_separator
+int next_separator(RawVector log, int index);
+RcppExport SEXP _AGread_next_separator(SEXP logSEXP, SEXP indexSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Datetime >::type start(startSEXP);
-    Rcpp::traits::input_parameter< Datetime >::type end(endSEXP);
-    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
-    rcpp_result_gen = Rcpp::wrap(get_times(start, end, samp_rate));
+    Rcpp::traits::input_parameter< RawVector >::type log(logSEXP);
+    Rcpp::traits::input_parameter< int >::type index(indexSEXP);
+    rcpp_result_gen = Rcpp::wrap(next_separator(log, index));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -161,15 +221,40 @@ BEGIN_RCPP
 END_RCPP
 }
 // checksumC
-void checksumC(RawVector log, int start_index, int end_index);
+bool checksumC(RawVector log, int start_index, int end_index);
 RcppExport SEXP _AGread_checksumC(SEXP logSEXP, SEXP start_indexSEXP, SEXP end_indexSEXP) {
 BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< RawVector >::type log(logSEXP);
     Rcpp::traits::input_parameter< int >::type start_index(start_indexSEXP);
     Rcpp::traits::input_parameter< int >::type end_index(end_indexSEXP);
-    checksumC(log, start_index, end_index);
-    return R_NilValue;
+    rcpp_result_gen = Rcpp::wrap(checksumC(log, start_index, end_index));
+    return rcpp_result_gen;
+END_RCPP
+}
+// blank_packet
+List blank_packet(int sample_rate, CharacterVector names);
+RcppExport SEXP _AGread_blank_packet(SEXP sample_rateSEXP, SEXP namesSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type sample_rate(sample_rateSEXP);
+    Rcpp::traits::input_parameter< CharacterVector >::type names(namesSEXP);
+    rcpp_result_gen = Rcpp::wrap(blank_packet(sample_rate, names));
+    return rcpp_result_gen;
+END_RCPP
+}
+// latch_packet
+List latch_packet(List last_packet, int sample_rate);
+RcppExport SEXP _AGread_latch_packet(SEXP last_packetSEXP, SEXP sample_rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type last_packet(last_packetSEXP);
+    Rcpp::traits::input_parameter< int >::type sample_rate(sample_rateSEXP);
+    rcpp_result_gen = Rcpp::wrap(latch_packet(last_packet, sample_rate));
+    return rcpp_result_gen;
 END_RCPP
 }
 // impute_C
@@ -184,9 +269,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// parse_IMU_C
-List parse_IMU_C(DataFrame imu_records, RawVector log, DataFrame info, int id, int samp_rate, bool verbose);
-RcppExport SEXP _AGread_parse_IMU_C(SEXP imu_recordsSEXP, SEXP logSEXP, SEXP infoSEXP, SEXP idSEXP, SEXP samp_rateSEXP, SEXP verboseSEXP) {
+// legacy_parse_IMU_C
+List legacy_parse_IMU_C(DataFrame imu_records, RawVector log, DataFrame info, int id, int samp_rate, bool verbose);
+RcppExport SEXP _AGread_legacy_parse_IMU_C(SEXP imu_recordsSEXP, SEXP logSEXP, SEXP infoSEXP, SEXP idSEXP, SEXP samp_rateSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -196,7 +281,23 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type id(idSEXP);
     Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(parse_IMU_C(imu_records, log, info, id, samp_rate, verbose));
+    rcpp_result_gen = Rcpp::wrap(legacy_parse_IMU_C(imu_records, log, info, id, samp_rate, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dev_parse_IMU_C
+List dev_parse_IMU_C(List packets, IntegerVector packet_no, List zero_packet, int id, int samp_rate, DataFrame info);
+RcppExport SEXP _AGread_dev_parse_IMU_C(SEXP packetsSEXP, SEXP packet_noSEXP, SEXP zero_packetSEXP, SEXP idSEXP, SEXP samp_rateSEXP, SEXP infoSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type packets(packetsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type packet_no(packet_noSEXP);
+    Rcpp::traits::input_parameter< List >::type zero_packet(zero_packetSEXP);
+    Rcpp::traits::input_parameter< int >::type id(idSEXP);
+    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type info(infoSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev_parse_IMU_C(packets, packet_no, zero_packet, id, samp_rate, info));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -247,6 +348,30 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// lux_payload
+DataFrame lux_payload(RawVector payload);
+RcppExport SEXP _AGread_lux_payload(SEXP payloadSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RawVector >::type payload(payloadSEXP);
+    rcpp_result_gen = Rcpp::wrap(lux_payload(payload));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dev_parse_lux
+List dev_parse_lux(List packets, IntegerVector packet_no, List zero_packet);
+RcppExport SEXP _AGread_dev_parse_lux(SEXP packetsSEXP, SEXP packet_noSEXP, SEXP zero_packetSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type packets(packetsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type packet_no(packet_noSEXP);
+    Rcpp::traits::input_parameter< List >::type zero_packet(zero_packetSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev_parse_lux(packets, packet_no, zero_packet));
+    return rcpp_result_gen;
+END_RCPP
+}
 // check_id
 void check_id(RawVector x, int id);
 RcppExport SEXP _AGread_check_id(SEXP xSEXP, SEXP idSEXP) {
@@ -269,9 +394,9 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// payload_parse_sensor_data_25C
-DataFrame payload_parse_sensor_data_25C(RawVector payload, DataFrame info, int id, int samp_rate, Datetime timestamp);
-RcppExport SEXP _AGread_payload_parse_sensor_data_25C(SEXP payloadSEXP, SEXP infoSEXP, SEXP idSEXP, SEXP samp_rateSEXP, SEXP timestampSEXP) {
+// legacy_payload_parse_sensor_data_25C
+DataFrame legacy_payload_parse_sensor_data_25C(RawVector payload, DataFrame info, int id, int samp_rate, Datetime timestamp);
+RcppExport SEXP _AGread_legacy_payload_parse_sensor_data_25C(SEXP payloadSEXP, SEXP infoSEXP, SEXP idSEXP, SEXP samp_rateSEXP, SEXP timestampSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -280,13 +405,27 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type id(idSEXP);
     Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
     Rcpp::traits::input_parameter< Datetime >::type timestamp(timestampSEXP);
-    rcpp_result_gen = Rcpp::wrap(payload_parse_sensor_data_25C(payload, info, id, samp_rate, timestamp));
+    rcpp_result_gen = Rcpp::wrap(legacy_payload_parse_sensor_data_25C(payload, info, id, samp_rate, timestamp));
     return rcpp_result_gen;
 END_RCPP
 }
-// payload_parse_activity2_26C
-DataFrame payload_parse_activity2_26C(RawVector payload, int samp_rate, int scale_factor, bool is_last_packet, Datetime timestamp);
-RcppExport SEXP _AGread_payload_parse_activity2_26C(SEXP payloadSEXP, SEXP samp_rateSEXP, SEXP scale_factorSEXP, SEXP is_last_packetSEXP, SEXP timestampSEXP) {
+// dev_payload_parse_sensor_data_25C
+List dev_payload_parse_sensor_data_25C(RawVector payload, DataFrame info, int id, int samp_rate);
+RcppExport SEXP _AGread_dev_payload_parse_sensor_data_25C(SEXP payloadSEXP, SEXP infoSEXP, SEXP idSEXP, SEXP samp_rateSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RawVector >::type payload(payloadSEXP);
+    Rcpp::traits::input_parameter< DataFrame >::type info(infoSEXP);
+    Rcpp::traits::input_parameter< int >::type id(idSEXP);
+    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev_payload_parse_sensor_data_25C(payload, info, id, samp_rate));
+    return rcpp_result_gen;
+END_RCPP
+}
+// legacy_payload_parse_activity2_26C
+DataFrame legacy_payload_parse_activity2_26C(RawVector payload, int samp_rate, int scale_factor, bool is_last_packet, Datetime timestamp);
+RcppExport SEXP _AGread_legacy_payload_parse_activity2_26C(SEXP payloadSEXP, SEXP samp_rateSEXP, SEXP scale_factorSEXP, SEXP is_last_packetSEXP, SEXP timestampSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -295,13 +434,27 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type scale_factor(scale_factorSEXP);
     Rcpp::traits::input_parameter< bool >::type is_last_packet(is_last_packetSEXP);
     Rcpp::traits::input_parameter< Datetime >::type timestamp(timestampSEXP);
-    rcpp_result_gen = Rcpp::wrap(payload_parse_activity2_26C(payload, samp_rate, scale_factor, is_last_packet, timestamp));
+    rcpp_result_gen = Rcpp::wrap(legacy_payload_parse_activity2_26C(payload, samp_rate, scale_factor, is_last_packet, timestamp));
     return rcpp_result_gen;
 END_RCPP
 }
-// parse_primary_accelerometerC
-List parse_primary_accelerometerC(DataFrame primary_records, RawVector log, int scale_factor, int samp_rate, bool verbose);
-RcppExport SEXP _AGread_parse_primary_accelerometerC(SEXP primary_recordsSEXP, SEXP logSEXP, SEXP scale_factorSEXP, SEXP samp_rateSEXP, SEXP verboseSEXP) {
+// dev_activity2_payload
+DataFrame dev_activity2_payload(RawVector payload, int samp_rate, int scale_factor, bool is_last_packet);
+RcppExport SEXP _AGread_dev_activity2_payload(SEXP payloadSEXP, SEXP samp_rateSEXP, SEXP scale_factorSEXP, SEXP is_last_packetSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< RawVector >::type payload(payloadSEXP);
+    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
+    Rcpp::traits::input_parameter< int >::type scale_factor(scale_factorSEXP);
+    Rcpp::traits::input_parameter< bool >::type is_last_packet(is_last_packetSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev_activity2_payload(payload, samp_rate, scale_factor, is_last_packet));
+    return rcpp_result_gen;
+END_RCPP
+}
+// legacy_parse_primary_accelerometerC
+List legacy_parse_primary_accelerometerC(DataFrame primary_records, RawVector log, int scale_factor, int samp_rate, bool verbose);
+RcppExport SEXP _AGread_legacy_parse_primary_accelerometerC(SEXP primary_recordsSEXP, SEXP logSEXP, SEXP scale_factorSEXP, SEXP samp_rateSEXP, SEXP verboseSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -310,36 +463,63 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type scale_factor(scale_factorSEXP);
     Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
     Rcpp::traits::input_parameter< bool >::type verbose(verboseSEXP);
-    rcpp_result_gen = Rcpp::wrap(parse_primary_accelerometerC(primary_records, log, scale_factor, samp_rate, verbose));
+    rcpp_result_gen = Rcpp::wrap(legacy_parse_primary_accelerometerC(primary_records, log, scale_factor, samp_rate, verbose));
+    return rcpp_result_gen;
+END_RCPP
+}
+// dev_parse_primary_accelerometerC
+List dev_parse_primary_accelerometerC(List packets, IntegerVector packet_no, List zero_packet, int samp_rate, int scale_factor);
+RcppExport SEXP _AGread_dev_parse_primary_accelerometerC(SEXP packetsSEXP, SEXP packet_noSEXP, SEXP zero_packetSEXP, SEXP samp_rateSEXP, SEXP scale_factorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< List >::type packets(packetsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type packet_no(packet_noSEXP);
+    Rcpp::traits::input_parameter< List >::type zero_packet(zero_packetSEXP);
+    Rcpp::traits::input_parameter< int >::type samp_rate(samp_rateSEXP);
+    Rcpp::traits::input_parameter< int >::type scale_factor(scale_factorSEXP);
+    rcpp_result_gen = Rcpp::wrap(dev_parse_primary_accelerometerC(packets, packet_no, zero_packet, samp_rate, scale_factor));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_AGread_get_int12", (DL_FUNC) &_AGread_get_int12, 4},
+    {"_AGread_activity_payload", (DL_FUNC) &_AGread_activity_payload, 4},
+    {"_AGread_dev_parse_activity", (DL_FUNC) &_AGread_dev_parse_activity, 5},
+    {"_AGread_dev1_bin_initialize", (DL_FUNC) &_AGread_dev1_bin_initialize, 3},
     {"_AGread_get_VM_C", (DL_FUNC) &_AGread_get_VM_C, 3},
-    {"_AGread_next_separator", (DL_FUNC) &_AGread_next_separator, 2},
+    {"_AGread_type3", (DL_FUNC) &_AGread_type3, 2},
     {"_AGread_get_headersC", (DL_FUNC) &_AGread_get_headersC, 2},
     {"_AGread_latch_accel", (DL_FUNC) &_AGread_latch_accel, 3},
     {"_AGread_get_latch_index", (DL_FUNC) &_AGread_get_latch_index, 2},
     {"_AGread_get_latch_values", (DL_FUNC) &_AGread_get_latch_values, 2},
     {"_AGread_get_latch_entries", (DL_FUNC) &_AGread_get_latch_entries, 6},
     {"_AGread_latch_replicate", (DL_FUNC) &_AGread_latch_replicate, 5},
-    {"_AGread_get_times", (DL_FUNC) &_AGread_get_times, 3},
+    {"_AGread_next_separator", (DL_FUNC) &_AGread_next_separator, 2},
     {"_AGread_get_short", (DL_FUNC) &_AGread_get_short, 4},
     {"_AGread_mid_round", (DL_FUNC) &_AGread_mid_round, 2},
     {"_AGread_print_progC", (DL_FUNC) &_AGread_print_progC, 2},
     {"_AGread_checksumC", (DL_FUNC) &_AGread_checksumC, 3},
+    {"_AGread_blank_packet", (DL_FUNC) &_AGread_blank_packet, 2},
+    {"_AGread_latch_packet", (DL_FUNC) &_AGread_latch_packet, 2},
     {"_AGread_impute_C", (DL_FUNC) &_AGread_impute_C, 2},
-    {"_AGread_parse_IMU_C", (DL_FUNC) &_AGread_parse_IMU_C, 6},
+    {"_AGread_legacy_parse_IMU_C", (DL_FUNC) &_AGread_legacy_parse_IMU_C, 6},
+    {"_AGread_dev_parse_IMU_C", (DL_FUNC) &_AGread_dev_parse_IMU_C, 6},
     {"_AGread_zero2one", (DL_FUNC) &_AGread_zero2one, 1},
     {"_AGread_interval_match", (DL_FUNC) &_AGread_interval_match, 2},
     {"_AGread_interpolate_C", (DL_FUNC) &_AGread_interpolate_C, 2},
     {"_AGread_interpolate_IMU", (DL_FUNC) &_AGread_interpolate_IMU, 2},
+    {"_AGread_lux_payload", (DL_FUNC) &_AGread_lux_payload, 1},
+    {"_AGread_dev_parse_lux", (DL_FUNC) &_AGread_dev_parse_lux, 3},
     {"_AGread_check_id", (DL_FUNC) &_AGread_check_id, 2},
     {"_AGread_imu_df", (DL_FUNC) &_AGread_imu_df, 1},
-    {"_AGread_payload_parse_sensor_data_25C", (DL_FUNC) &_AGread_payload_parse_sensor_data_25C, 5},
-    {"_AGread_payload_parse_activity2_26C", (DL_FUNC) &_AGread_payload_parse_activity2_26C, 5},
-    {"_AGread_parse_primary_accelerometerC", (DL_FUNC) &_AGread_parse_primary_accelerometerC, 5},
+    {"_AGread_legacy_payload_parse_sensor_data_25C", (DL_FUNC) &_AGread_legacy_payload_parse_sensor_data_25C, 5},
+    {"_AGread_dev_payload_parse_sensor_data_25C", (DL_FUNC) &_AGread_dev_payload_parse_sensor_data_25C, 4},
+    {"_AGread_legacy_payload_parse_activity2_26C", (DL_FUNC) &_AGread_legacy_payload_parse_activity2_26C, 5},
+    {"_AGread_dev_activity2_payload", (DL_FUNC) &_AGread_dev_activity2_payload, 4},
+    {"_AGread_legacy_parse_primary_accelerometerC", (DL_FUNC) &_AGread_legacy_parse_primary_accelerometerC, 5},
+    {"_AGread_dev_parse_primary_accelerometerC", (DL_FUNC) &_AGread_dev_parse_primary_accelerometerC, 5},
     {NULL, NULL, 0}
 };
 

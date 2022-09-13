@@ -4,8 +4,13 @@
 \alias{AG_collapse}
 \title{Collapse primary accelerometer data}
 \usage{
-AG_collapse(AG, output_window_secs = 1, samp_freq, method = "default",
-  ENMO2 = NULL)
+AG_collapse(
+  AG,
+  output_window_secs = 1,
+  samp_freq,
+  method = "default",
+  ENMO2 = NULL
+)
 }
 \arguments{
 \item{AG}{a dataframe of raw primary accelerometer data}
@@ -19,6 +24,9 @@ either "default" or "block"}
 
 \item{ENMO2}{vector of leftover raw values from the previous block (if
 applicable)}
+}
+\value{
+A data frame of collapsed acceleration summaries
 }
 \description{
 Collapse primary accelerometer data

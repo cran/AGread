@@ -7,6 +7,8 @@
 #' @inheritParams read_gt3x
 #' @param ... further arguments passed to methods
 #'
+#' @return A list of packet information
+#'
 #' @keywords internal
 parse_packet_set <- function(
   set, log, tz = "UTC", verbose = FALSE,
@@ -27,10 +29,27 @@ parse_packet_set.default <- function(
   ...
 ) {
 
-  warning(paste(
-    "No method exists yet for parsing",
-    class(set)[1], "packets -- returning NULL."
-  ))
+  warning(
+    "No method exists yet for parsing ",
+    class(set)[1], " packets -- returning NULL."
+  )
+
+  return(NULL)
+
+}
+
+#' @rdname parse_packet_set
+#' @export
+parse_packet_set.ACTIVITY <- function(
+  set, log, tz = "UTC", verbose = FALSE,
+  ...
+) {
+
+  warning(
+    "ACTIVITY packets can only be parsed if ",
+    "you set\n  `parser = \"dev\"` -- returning",
+    " NULL for now.", call. = FALSE
+  )
 
   return(NULL)
 

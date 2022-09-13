@@ -7,11 +7,17 @@
 get_minute(timestamp, format = "\%Y-\%m-\%d \%H:\%M:\%S", rational = FALSE)
 }
 \arguments{
-\item{timestamp}{A character vector containing timestamp information}
+\item{timestamp}{A character or POSIX-formatted vector containing timestamp
+information}
 
-\item{format}{The date-time format of the \code{timestamp} vector}
+\item{format}{The date-time format of \code{timestamp}, if it is a character
+vector}
 
 \item{rational}{A logical scalar. Use rational number to represent seconds?}
+}
+\value{
+numerical value(s) representing the minute of the day in the
+  interval \code{[0, 1440)}
 }
 \description{
 Converts a timestamp to a numerical value between 0 (midnight) and 1439

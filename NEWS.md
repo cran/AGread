@@ -1,13 +1,46 @@
-# AGread 1.1.1
+# AGread 1.3.2
+
+  `collapse_packet_set` has been moved to internal, consistent
+  with the original intent
+  
+  
+# AGread 1.3.1
+
+  Package documentation has been updated in response to requests from CRAN.
+
+
+# AGread 1.3.0
+
+  Dependency on the `binaryLogic` package has been circumvented, as the latter
+  package was archived in April 2022.
+  
+  Additionally, reintegration has been restructured with both of the
+  previously-implemented methods now available in a single `reintegrate`
+  function
+
+## Changes
+
+  * Removed dependency on `binaryLogic`
+  * Updated the interface for reintegration
+  * Added header skip recognition in csv-reading-related functions
+  * Enhanced the external parser including alignment checks with internal
+    cache of test files.
+
+
+# AGread 1.2.0
+
+  * Added reintegrate2
+  * Added a `parser = "external"` option for `read_gt3x`, which serves
+    as a wrapper and formatter around `read.gt3x::read.gt3x`
 
 ## Changes
 
   * Fixed bugs related to overload and argument classes
   
+  
+  
 # AGread 1.1.0
 
-## Summary
-  
 ## Changes
 
   * Revised interpolation schemes where necessary to ensure
@@ -20,15 +53,17 @@
   * Accounted for trailing zeroes in packets
   * Fixed column name detection in `read_AG_counts`
 
+
+
 # AGread 1.0.0
 
 ## Summary
 
   Version 1.0.0 features speedup via Rcpp in the `read_gt3x`
-    function. There is also increased reliance on S3 OOP
-    in the background code. The output is now successfully
-    tested for alignment with \*RAW.csv and \*-IMU.csv
-    output, having accounted for several issues noted below.
+  function. There is also increased reliance on S3 OOP
+  in the background code. The output is now successfully
+  tested for alignment with \*RAW.csv and \*-IMU.csv
+  output, having accounted for several issues noted below.
       
 ## Changes
 
@@ -44,11 +79,13 @@
     reading methods (csv output vs gt3x output etc.)
   * Updated example data
 
+
+
 # AGread 0.2.2
 
 ## Summary
 
-  This is a second resubmission of version 0.2.0
+  Resubmission of version 0.2.0
     
 ## Changes
 
@@ -56,11 +93,13 @@
     usage conditions of material derived from
     <https://github.com/actigraph/GT3X-File-Format>.
 
+
+
 # AGread 0.2.1
 
 ## Summary
 
-  This is a resubmission of version 0.2.0
+  Resubmission of version 0.2.0
     
 ## Changes
 
@@ -73,12 +112,13 @@
     DESCRIPTION has been changed to `file LICENSE` to prevent misrepresentation
     of the package copyright.
     
-  * Dependency `reshape2` was removed to resolve a NOTE on
-    <https://cran.r-project.org/web/checks/check_results_AGread.html> for
+  * Dependency `reshape2` was removed to resolve a NOTE in CRAN checks for
     r-devel-linux-x86_64-fedora-clang, r-devel-linux-x86_64-fedora-gcc, and
     r-patched-solaris-x86.
     
   * Documentation was updated.
+    
+  
     
 # AGread 0.2.0
 
@@ -98,15 +138,17 @@
   * Added chunking as an option for reading RAW.csv files that are too large
       and cause memory issues
   * Added option to apply autocalibration with GGIR
-  * Added option to return raw (uncollapsed) data (#3, @srlamunion)
+  * Added option to return raw (un-collapsed) data (#3, @srlamunion)
   * Updated time stamp calculations and time zone specifications where needed
   * Set up automated testing for continued development
+
+
 
 # AGread 0.1.2
 
 ## Summary
 
-  This is a resubmission of the original version
+  Resubmission of original version
   
 ## Changes
 
@@ -116,19 +158,23 @@
   * Improved the documentation of classify_magnetometer()
   * Exported AG_meta()
 
+
+
 # AGread 0.1.1
 
 ## Summary
 
-  This is a resubmission of the original version
+  Resubmission of original version
   
 ## Changes
 
   * Added Vincent van Hees as contributor
   * Added URL and BugReports fields to DESCRIPTION
 
+
+
 # AGread 0.1.0
 
 ## Summary
 
-  * This is the initial version of `AGread`.
+  * Initial package version

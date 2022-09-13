@@ -13,6 +13,9 @@ get_imu_file_meta(file, output_window_secs = 1)
 \item{output_window_secs}{the desired epoch length, over which to average IMU
 data}
 }
+\value{
+a list of metadata information
+}
 \description{
 Get file metadata (sampling frequency, start time, and samples per epoch) for
 IMU

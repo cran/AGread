@@ -1,116 +1,133 @@
-#' Reintegrate a data stream
+#' Reintegrate ActiGraph data
 #'
-#' @param ag A data frame to reintegrate
-#' @param to The epoch length desired. Starting epoch length will be determined
-#'   automatically.
+#' @param ag a data frame to reintegrate
+#' @param target_sec the desired epoch length of the output. Starting epoch
+#'   length will be determined automatically
 #' @param time_var The name of the column containing POSIX-formatted timestamp
 #'   information
+#' @param method character scalar indicating the desired method of
+#'   reintegration. Options are \code{tidy} (the default) and \code{legacy}. See
+#'   details
+#' @param ... arguments passed to \code{reintegrate_legacy}
 #' @param direction The direction of reintegration, i.e. whether a timestamp
 #'   refers to the timespan after the previous data point ("backwards"), or
 #'   before the next data point ("forwards").
 #' @param verbose logical. Print updates to console?
 #'
+#' @details
+#'
+#' Two methods are provided. One is a legacy method that allows "forward" or
+#' "backward" reintegration, depending on whether the timestamp occurs
+#' (respectively) at the start of the interval (typical for activity monitors)
+#' or the end (typical for indirect calorimeters). The other is a \code{tidy}
+#' approach, which is both more straightforward and more concise. However,
+#' runtime implications are uncertain, and only forward reintegration is
+#' supported (consistent with 'ActiLife' precedent).
+#'
+#'
+#' @return A data frame of reintegrated activity count data
+#'
+#'
 #' @export
 #'
 #' @examples
 #'
-#' data("imu_to_check", package = "AGread")
-#' ag <-
-#'   imu_to_check[ ,c("Timestamp", "mean_abs_Gyroscope_x_DegPerS")]
+#' test_file <- system.file(
+#'   "extdata", "example1sec.csv", package = "AGread"
+#' )
 #'
-#' # Forwards reintegration
-#'   reintegrate(
+#' ag <- read_AG_counts(test_file, header = TRUE)
+#'
+#' # Old Method:
+#'
+#'   old_result <- reintegrate(
 #'     ag = ag,
-#'     to = 60,
+#'     target_sec = 60,
 #'     time_var = "Timestamp",
+#'     method = "legacy",
 #'     direction = c("forwards")
 #'   )
 #'
-#' # Backwards reintegration
-#'   reintegrate(
-#'     ag = ag,
-#'     to = 60,
-#'     time_var = "Timestamp",
-#'     direction = c("backwards")
-#'   )
-#' \dontrun{
-#' # Erronious usages that will give a warning
-#'   reintegrate(
-#'     ag = ag,
-#'     to = 60,
-#'     time_var = "Timestamp",
-#'     direction = c("forwards", "backwards")
-#'   )
+#' # New Method:
 #'
-#'   reintegrate(
-#'     ag = ag,
-#'     to = 60,
-#'     time_var = "Timestamp"
-#'   )
-#' }
+#'   new_result <- reintegrate(ag, 60)
 #'
-reintegrate <- function(ag, to, time_var = "Timestamp",
-  direction = c("forwards", "backwards"), verbose = FALSE) {
-  # to <- 60
-  # time_var <- "Timestamp"
-  # direction <- "backwards"
+reintegrate <- function(
+  ag, target_sec, time_var = "Timestamp",
+  method = c("tidy", "legacy"), ...
+) {
 
-  direction <- try(
-    match.arg(direction, c("forwards", "backwards", "error")),
-    silent = TRUE)
+  method <- match.arg(method)
 
-  if (class(direction) == "try-error") {
-    warning(paste("Argument `direction` must be exactly one of",
-      "\"forwards\" or \"backwards\". Defaulting to forwards."))
-    direction <- "forwards"
-  }
+  if (method == "legacy") return(
+    reintegrate_legacy(ag, target_sec, time_var, ...)
+  )
 
-  start_epoch <- unique(diff.POSIXt(ag[ ,time_var]))
-  if (start_epoch == to) {
-    if (verbose) cat(
-      "\nReturning original data --",
-      "already in desired epoch length"
-    )
-    return(ag)
-  }
+  e <- get_epoch(ag, time_var)
 
-  stopifnot(length(start_epoch) == 1, (to / start_epoch) %% 1 == 0)
+  if (e == target_sec) return(ag)
 
-  block_size <- to / start_epoch
-  ag <- get_blocks(ag, time_var, to, start_epoch, block_size, direction)
+  if (e > target_sec) stop(
+    "Cannot reintegrate to a shorter epoch length (`target_sec` == ", target_sec,
+    ", but `get_epoch(AG)` == ", e, ")", call. = FALSE
+  )
 
-  col_classes <- sapply(ag, function(x) class(x)[1])
-  col_numeric <- col_classes %in% c("numeric", "integer")
-  first_vars  <- names(col_classes)[!col_numeric]
-  sum_vars    <- names(col_classes)[col_numeric]
+  ag %>%
+  dplyr::group_by(
+    !!as.name(time_var) := lubridate::floor_date(
+      !!as.name(time_var), paste(target_sec, "sec"))
+  ) %>%
+  dplyr::summarise(
+    dplyr::across(where(is.numeric), sum),
+    dplyr::across(where(function(x) !is.numeric(x)), dplyr::first)
+  ) %>%
+  dplyr::select(dplyr::all_of(names(ag))) %>%
+  as.data.frame(.) %>%
+  vm_reformat(verbose = FALSE)
 
-  ag[ ,time_var]  <- as.character(ag[ ,time_var])
-  firsts  <-
-    sapply(match(first_vars, names(ag)), function(x)
-      tapply(ag[ ,x], ag$block_no, function(y)
-        switch(direction,
-          "forwards" = y[1], "backwards" = y[length(y)])))
-  firsts <-
-    stats::setNames(data.frame(firsts, stringsAsFactors = FALSE),
-      first_vars)
+}
 
-  sums    <-
-    sapply(match(sum_vars, names(ag)), function(x)
-      tapply(ag[ ,x], ag$block_no, sum, na.rm = TRUE))
-  sums <- stats::setNames(data.frame(sums, stringsAsFactors = FALSE),
-    sum_vars)
 
-  ag <- data.frame(cbind(firsts, sums), stringsAsFactors = FALSE)
-  ag[ ,sum_vars] <- sapply(ag[ ,sum_vars], as.numeric)
-  ag[ ,time_var] <- as.POSIXct(ag$Timestamp, "UTC")
+# Legacy method -----------------------------------------------------------
 
-  ag$block_no <- NULL
+#' @rdname reintegrate
+reintegrate_legacy <- function(
+  ag, target_sec, time_var = "Timestamp",
+  direction = c("forwards", "backwards"), verbose = FALSE
+) {
 
-  triaxial_vars <- c("Axis1", "Axis2", "Axis3")
-  if (all(triaxial_vars %in% names(ag))) {
-    ag$Vector.Magnitude <-
-      round(get_VM(ag[ ,triaxial_vars]), 2)
-  }
+  ## Initial setup
 
-  return(ag)
+  setup <- reintegrate_setup(
+    ag, target_sec, time_var, direction, verbose
+  )
+  if (is.null(setup$start_epoch)) return(ag)
+
+  ## Establish the reintegrated epoch groupings
+
+  ag %<>% get_blocks(
+    time_var, target_sec, setup$start_epoch, setup$direction
+  )
+
+  ## Run the reintegration operations
+
+  ag <-
+    switch(
+      setup$direction,
+      "forwards" = dplyr::first,
+      "backwards" = dplyr::last
+    ) %>%
+    {mapply(
+      reint_wrap,
+      input_vars = list(setup$char_vars, setup$num_vars),
+      fun = list(., sum),
+      MoreArgs = list(ag = ag),
+      SIMPLIFY = FALSE
+    )} %>%
+    data.frame(stringsAsFactors = FALSE, row.names = NULL)
+
+  ## Re-format VM and return
+
+  vm_reformat(ag, verbose = verbose)
+
 }

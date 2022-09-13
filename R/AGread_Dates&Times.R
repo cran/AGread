@@ -3,9 +3,14 @@
 #' Converts a timestamp to a numerical value between 0 (midnight) and 1439
 #' (23:59). Seconds can be represented using a rational decimal.
 #'
-#' @param timestamp A character vector containing timestamp information
-#' @param format The date-time format of the \code{timestamp} vector
+#' @param timestamp A character or POSIX-formatted vector containing timestamp
+#'   information
+#' @param format The date-time format of \code{timestamp}, if it is a character
+#'   vector
 #' @param rational A logical scalar. Use rational number to represent seconds?
+#'
+#' @return numerical value(s) representing the minute of the day in the
+#'   interval \code{[0, 1440)}
 #'
 #' @examples
 #' key_times <-
@@ -19,23 +24,14 @@
 #' get_minute(key_times, rational = TRUE)
 #'
 #' @export
-get_minute <- function(timestamp, format = "%Y-%m-%d %H:%M:%S", rational = FALSE) {
+get_minute <- function(
+  timestamp, format = "%Y-%m-%d %H:%M:%S", rational = FALSE
+) {
 
-    timestamp <- as.POSIXlt(timestamp, format = format, tz = "UTC")
-
-    hour      <-  60 * as.numeric(
-      strftime(timestamp, format = "%H", tz = "UTC")
-    )
-    minute    <- as.numeric(
-      strftime(timestamp, format = "%M", tz = "UTC")
-    )
-    second    <- (1/60) * as.numeric(
-      strftime(timestamp, format = "%S", tz = "UTC")
-    )
-
-    final_minute <- hour + minute + second
-    if(!rational) final_minute <- floor(final_minute)
-    return(final_minute)
+  check_time(timestamp, format) %>%
+  {. - lubridate::floor_date(., "days")} %>%
+  as.numeric("mins") %>%
+  {. - ((. - floor(.))*!rational)}
 
 }
 
@@ -53,13 +49,19 @@ get_minute <- function(timestamp, format = "%Y-%m-%d %H:%M:%S", rational = FALSE
 #'
 #' @export
 get_day_of_year <- function(timestamp, format = "%Y-%m-%d %H:%M:%S") {
-    timestamp <- as.POSIXlt(
-      timestamp,
-      tz = "UTC",
-      format = format
-    )
-    day_of_year <- as.numeric(
-      strftime(timestamp, format = "%j", tz = "UTC")
-    )
-    return(day_of_year)
+
+  check_time(timestamp, format) %>%
+  strftime(format = "%j", tz = "UTC") %>%
+  as.numeric(.)
+
+}
+
+#' @inheritParams get_minute
+#' @keywords internal
+check_time <- function(timestamp, format) {
+
+  timestamp %T>%
+  {stopifnot(inherits(., c("character", "POSIXt")))} %>%
+  {if (is.character(.)) as.POSIXlt(., "UTC", format = format) else .}
+
 }

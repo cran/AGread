@@ -9,9 +9,13 @@ check_columns(file, skip, ...)
 \arguments{
 \item{file}{A character scalar giving path to primary accelerometer file}
 
-\item{skip}{Header length: Number of rows to skip when reading the file}
+\item{skip}{number of lines to skip when reading \code{file}}
 
 \item{...}{Arguments passed to \code{\link{read.csv}}}
+}
+\value{
+a logical scalar indicating whether there was only one column
+  detected when reading the file
 }
 \description{
 \code{check_columns} returns a logical scalar indicating whether there is a

@@ -50,3 +50,41 @@ get_VM <- function(
   stopifnot(ncol(triaxial) == 3)
   apply(triaxial, 1, function(x) sqrt(sum(x^2)))
 }
+
+#' Retrieve the epoch length of an ActiGraph data frame
+#'
+#' @param AG data frame of ActiGraph data
+#' @param time_var character scalar. Name of the time variable column
+#'
+#' @return scalar epoch length
+#' @export
+#'
+#' @examples
+#' AG <- read_AG_counts(
+#'   system.file("extdata/example1sec.csv", package = "AGread"),
+#'   header = TRUE
+#' )
+#' get_epoch(AG)
+get_epoch <- function(AG, time_var = "Timestamp") {
+
+  stopifnot(
+    inherits(AG, "data.frame"),
+    exists(time_var, AG)
+  )
+
+  nrow(AG) %>%
+  {. * 0.1} %>%
+  ceiling(.) %>%
+  max(2) %>%
+  seq(.) %>%
+  AG[., time_var] %>%
+  PAutilities::epoch_length_sec(.)
+
+}
+
+find_skip <- function(filename) {
+  readLines(filename, 25) %>%
+  grepl("^-----", .) %>%
+  which(.) %>%
+  max(.)
+}

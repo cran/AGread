@@ -1,17 +1,10 @@
-#' Collapse a set of processed gt3x packets
-#'
-#' @inheritParams parse_packet_set
-#' @param results the processed packet information
-#'
-#' @keywords internal
 collapse_packet_set <- function(set, results, ...) {
 
   UseMethod("collapse_packet_set", set)
 
 }
 
-#' @rdname collapse_packet_set
-#' @export
+
 collapse_packet_set.default <- function(set, results, ...) {
 
   results <- do.call(rbind, results)

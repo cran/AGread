@@ -1,10 +1,3 @@
-#' Remove trailing rows with missing values from data frame
-#'
-#' @param ag A data frame on which to perform the operation
-#'
-#' @keywords internal
-#'
-#'
 rm_trail_na <- function(ag) {
   missing <- apply(ag, 1, function(x) any(is.na(x)))
   indices <- rev(which(missing))
@@ -21,42 +14,164 @@ rm_trail_na <- function(ag) {
   return(ag[seq(last_row), ])
 }
 
-#' Assign blocks to data stream for reintegration
-#'
-#' @inheritParams reintegrate
-#' @param start_epoch The initial epoch length of the data being reintegrated
-#' @param block_size The number of rows of data included in each reintegrated
-#'   epoch
-#'
-#' @keywords internal
-#'
-get_blocks <- function(ag, time_var, to, start_epoch, block_size, direction) {
 
-  if (direction == "forwards") {
-    begin <- which(as.numeric(ag[ ,time_var]) %% to == 0)[1]
+validate_direction <- function(direction) {
+
+  direction <- try(
+    match.arg(
+      direction, c("err", "forwards", "backwards"), FALSE
+    ),
+    silent = TRUE
+  )
+
+  if (inherits(direction, "try-error") | direction == "err") {
+    warning(paste("Argument `direction` must be exactly one of",
+      "\"forwards\" or \"backwards\". Defaulting to forwards."))
+    direction <- "forwards"
   }
 
-  if (direction == "backwards") {
-    begin <- which(as.numeric(ag[ ,time_var]) %% to == 0)[2]
-    begin <- begin - (block_size - 1)
-    keep <- seq(nrow(ag)) >= begin
-    ag <- ag[keep, ]
+  direction
 
-    begin <- 1
+}
+
+
+check_epoch <- function(ag, to, time_var, verbose) {
+
+  get_epoch(ag, time_var) %T>%
+  {stopifnot(
+    (to / .) %% 1 == 0
+  )} %>%
+  {if (. == to) {
+    if (verbose) cat(
+      "\nReturning original data --",
+      "already in desired epoch length"
+    )
+    NULL
+  } else {
+    .
+  }}
+
+}
+
+
+reintegrate_setup <- function(
+  ag, to, time_var = "Timestamp",
+  direction = c("forwards", "backwards"), verbose = FALSE
+) {
+
+  col_classes <- sapply(ag, function(x) class(x)[1])
+  col_numeric <- col_classes %in% c("numeric", "integer")
+
+  list(
+
+    direction = validate_direction(direction),
+
+    start_epoch = check_epoch(
+      ag, to, time_var, verbose
+    ),
+
+    char_vars = names(col_classes)[!col_numeric],
+
+    num_vars = names(col_classes)[col_numeric],
+
+    tz = lubridate::tz(ag[ ,time_var])
+
+  )
+
+}
+
+
+test_second <- function(timestamp, to) {
+  lubridate::floor_date(timestamp, "1 min") %>%
+  {timestamp - .} %>%
+  as.numeric(.) %>%
+  {. %% to == 0}
+}
+
+
+forwards_start <- function(
+  ag, time_var, to, block_size, begin = 1
+) {
+
+  while (!test_second(ag[begin, time_var], to)) {
+    begin %<>% {. + 1}
   }
 
-  new_block <- (as.numeric(ag[begin ,time_var]) %% to)
-  block_no  <- cumsum(as.numeric(ag[ ,time_var]) %% to == new_block)
+  begin
 
-  sizes <- tapply(block_no, block_no, length)
-  keep  <- sizes == block_size
+}
 
-  ag$block_no   <- block_no
-  ag$block_size <- sizes[match(block_no, names(sizes))]
-  ag$keep       <- keep[match(block_no, names(keep))]
 
-  ag            <- ag[ag$keep, ]
-  ag$keep       <- NULL
-  ag$block_size <- NULL
-  return(ag)
+backwards_start <- function(
+  ag, time_var, to, block_size, begin = 1
+) {
+
+  while(!all(
+    test_second(ag[begin, time_var], to),
+    begin - block_size + 1 > 0
+  )) {
+    begin %<>% {. + 1}
+  }
+
+  begin - block_size + 1
+
+}
+
+
+get_blocks <- function(
+  ag, time_var, to, start_epoch, direction
+) {
+
+  block_size <- to / start_epoch
+
+  ag <-
+    switch(
+      direction,
+      "forwards"  = forwards_start(ag, time_var, to, block_size),
+      "backwards" = backwards_start(ag, time_var, to, block_size)
+    ) %>%
+    setdiff(1:., .) %>%
+    {if (!length(.)) ag else ag[-., ]}
+
+  while ( (nrow(ag)*start_epoch) %% to != 0 ) {
+    ag %<>% {.[-nrow(.), ]}
+  }
+
+  ag$block <-
+    nrow(ag) %>%
+    {. / block_size} %T>%
+    {stopifnot(. %% 1 == 0)} %>%
+    seq(.) %>%
+    rep(each = block_size) %T>%
+    {stopifnot(length(.) == nrow(ag))}
+
+  ag
+
+}
+
+
+reint_wrap <- function(ag, input_vars, fun) {
+
+  c(input_vars, "block") %>%
+  unique(.) %>%
+  ag[ ,.] %>%
+  dplyr::group_by(block) %>%
+  dplyr::summarise_all(fun) %>%
+  data.frame(stringsAsFactors = FALSE) %>%
+  .[ ,input_vars]
+
+}
+
+
+vm_reformat <- function(ag, verbose) {
+
+  if (all(.triaxial_vars %in% names(ag))) {
+    ag$Vector.Magnitude <-
+      ag[ ,.triaxial_vars] %>%
+      get_VM("Rcpp", verbose) %>%
+      round(2)
+  }
+
+  ag
+
 }

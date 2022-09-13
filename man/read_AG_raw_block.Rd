@@ -4,8 +4,16 @@
 \alias{read_AG_raw_block}
 \title{Read a large raw file in blocks}
 \usage{
-read_AG_raw_block(file, output_window_secs, calibrate, verbose, skip, meta,
-  timer, ...)
+read_AG_raw_block(
+  file,
+  output_window_secs,
+  calibrate,
+  verbose,
+  skip,
+  meta,
+  timer,
+  ...
+)
 }
 \arguments{
 \item{file}{A character scalar giving path to primary accelerometer file}
@@ -15,8 +23,6 @@ read_AG_raw_block(file, output_window_secs, calibrate, verbose, skip, meta,
 \item{calibrate}{logical. Perform autocalibration using \link[GGIR]{g.calibrate}}
 
 \item{verbose}{A logical scalar: Print processing updates?}
-
-\item{skip}{Header length: Number of rows to skip when reading the file}
 
 \item{meta}{information from \code{\link{get_raw_file_meta}}}
 

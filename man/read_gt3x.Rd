@@ -4,10 +4,19 @@
 \alias{read_gt3x}
 \title{Read data from a gt3x file}
 \usage{
-read_gt3x(file, tz = "UTC", verbose = FALSE, include = c("METADATA",
-  "PARAMETERS", "SENSOR_SCHEMA", "BATTERY", "EVENT", "TAG", "ACTIVITY",
-  "HEART_RATE_BPM", "HEART_RATE_ANT", "HEART_RATE_BLE", "LUX", "CAPSENSE",
-  "EPOCH", "EPOCH2", "EPOCH3", "EPOCH4", "ACTIVITY2", "SENSOR_DATA"))
+read_gt3x(
+  file,
+  tz = "UTC",
+  verbose = FALSE,
+  include = c("METADATA", "PARAMETERS", "SENSOR_SCHEMA", "BATTERY", "EVENT", "TAG",
+    "ACTIVITY", "HEART_RATE_BPM", "HEART_RATE_ANT", "HEART_RATE_BLE", "LUX", "CAPSENSE",
+    "EPOCH", "EPOCH2", "EPOCH3", "EPOCH4", "ACTIVITY2", "SENSOR_DATA"),
+  flag_idle_sleep = FALSE,
+  parser = c("legacy", "dev", "external"),
+  cleanup = FALSE,
+  data_checks = TRUE,
+  ...
+)
 }
 \arguments{
 \item{file}{character. Path to the file}
@@ -17,6 +26,26 @@ read_gt3x(file, tz = "UTC", verbose = FALSE, include = c("METADATA",
 \item{verbose}{logical. Print updates to console?}
 
 \item{include}{character. The PACKET types to parse}
+
+\item{flag_idle_sleep}{should recorded idle sleep times be tagged?}
+
+\item{parser}{the parsing scheme to use, either \code{legacy}, \code{dev}, or
+\code{external}. The legacy parser runs slowly but includes more extensive
+checks to ensure alignment with \code{RAW.csv} and \code{IMU.csv} files.
+The development parser runs faster and has also been checked for alignment
+with \code{RAW.csv} and \code{IMU.csv} files, but not as strictly. For
+example, rounding is not performed by \code{parser="dev"}. The external
+parser is a wrapper for \code{read.gt3x::read.gt3x}, and specific arguments
+can be passed in via \code{...}}
+
+\item{cleanup}{logical. Delete unzipped files?}
+
+\item{data_checks}{logical. Run extra checks on the data (e.g. for large
+values and duplicated timestamps)?  Set to \code{FALSE} to speed up
+reading.}
+
+\item{...}{arguments passed to \code{read.gt3x::read.gt3x} when
+\code{parser == "external"}}
 }
 \value{
 A list of processed data, with one element for each of the relevant

@@ -15,6 +15,9 @@ imu_filter_gyroscope(AG, samp_rate, filter_hz = 35, verbose = FALSE)
 
 \item{verbose}{A logical scalar: Print processing updates?}
 }
+\value{
+A data frame with filtered gyroscope data
+}
 \description{
 Low-Pass filter Gyroscope data
 }

@@ -4,6 +4,21 @@
 #' @param tz character. The timezone to use
 #' @param verbose logical. Print updates to console?
 #' @param include character. The PACKET types to parse
+#' @param flag_idle_sleep should recorded idle sleep times be tagged?
+#' @param parser the parsing scheme to use, either \code{legacy}, \code{dev}, or
+#'   \code{external}. The legacy parser runs slowly but includes more extensive
+#'   checks to ensure alignment with \code{RAW.csv} and \code{IMU.csv} files.
+#'   The development parser runs faster and has also been checked for alignment
+#'   with \code{RAW.csv} and \code{IMU.csv} files, but not as strictly. For
+#'   example, rounding is not performed by \code{parser="dev"}. The external
+#'   parser is a wrapper for \code{read.gt3x::read.gt3x}, and specific arguments
+#'   can be passed in via \code{...}
+#' @param cleanup logical. Delete unzipped files?
+#' @param data_checks logical. Run extra checks on the data (e.g. for large
+#'   values and duplicated timestamps)?  Set to \code{FALSE} to speed up
+#'   reading.
+#' @param ... arguments passed to \code{read.gt3x::read.gt3x} when
+#'   \code{parser == "external"}
 #'
 #' @return A list of processed data, with one element for each of the relevant
 #'   packet types.
@@ -30,64 +45,140 @@
 #'
 read_gt3x <- function(
   file, tz = "UTC", verbose = FALSE,
-  include = c("METADATA", "PARAMETERS", "SENSOR_SCHEMA", "BATTERY", "EVENT",
-  "TAG", "ACTIVITY", "HEART_RATE_BPM", "HEART_RATE_ANT", "HEART_RATE_BLE",
-  "LUX", "CAPSENSE", "EPOCH", "EPOCH2", "EPOCH3", "EPOCH4", "ACTIVITY2",
-  "SENSOR_DATA")
+  include =   c("METADATA", "PARAMETERS", "SENSOR_SCHEMA", "BATTERY", "EVENT",
+                "TAG", "ACTIVITY", "HEART_RATE_BPM", "HEART_RATE_ANT", "HEART_RATE_BLE",
+                "LUX", "CAPSENSE", "EPOCH", "EPOCH2", "EPOCH3", "EPOCH4", "ACTIVITY2",
+                "SENSOR_DATA"),
+  flag_idle_sleep = FALSE, parser = c("legacy", "dev", "external"), cleanup = FALSE,
+  data_checks = TRUE, ...
 ) {
 
-  timer <- PAutilities::manage_procedure(
-    "Start", "\nProcessing", basename(file), "\n",
-    verbose = verbose
-  )
 
-  #1) Verify .gt3x file is a zip file
+  ## Setup
 
-    file_3x <- try(
-      utils::unzip(file, list = TRUE),
-      TRUE
+    timer <- PAutilities::manage_procedure(
+      "Start", "\nProcessing", basename(file), "\n",
+      verbose = verbose
     )
 
-    if ("try-error" %in% class(file_3x)) {
-      stop(paste(
-        deparse(substitute(file)),
-        "is not a valid gt3x file."
-      ))
+    parser <- match.arg(parser)
+
+    file %<>% read_gt3x_setup(verbose, cleanup)
+
+    info <- read_gt3x_info(file, tz, verbose)
+
+
+  ## Read the bin file
+
+    if (verbose) cat("\n  Reading log.bin")
+
+      log  <-
+        file$path %>%
+        utils::unzip("log.bin", exdir = tempdir()) %>%
+        readBin(
+          "raw", file$result["log.bin", "Length"]
+        )
+
+    if (verbose) cat("  ............. COMPLETE")
+
+
+  ## Parse the log file
+
+    if (parser == "external") {
+
+      log %<>% external_parser(info, file, tz, verbose, ...)
+
     } else {
-      row.names(file_3x) <- file_3x$Name
+
+      log %<>% parse_log_bin(info, tz, verbose, include, parser, file)
+
     }
 
-  #2) Verify .gt3x file has log.bin file
-  #3) Verify .gt3x file has info.txt file
 
-    stopifnot(all(c("info.txt", "log.bin") %in% file_3x$Name))
+  ## Flag idle sleep if requested
 
-  #4) Extract info.txt
+    if (flag_idle_sleep) {
 
-    info_con <- unz(file, "info.txt")
+      if (!all(
+        "RAW" %in% names(log),
+        "EVENT" %in% names(log)
+      )) {
 
-  #5) Parse and save the sample rate from the info.txt file (it's stored in Hz)
-  #6) Parse and save the start date from the info.txt file (it's stored in .NET
-  #Ticks)
+        warning(
+          "Cannot flag idle sleep unless both `RAW` and `EVENT` are elements",
+          " of the output.\n  Make sure `include` contains \"ACTIVITY\",",
+          "\"ACTIVITY2\", and \"EVENT\".", call. = FALSE
+        )
 
-    info <- parse_info_txt(info_con, tz, verbose)
-    close(info_con)
+      } else {
 
-  #7) Extract log.bin
-  #8) Parse log.bin
+        log$RAW %<>% flag_idle(log$EVENT, verbose)
 
-    log_file  <- utils::unzip(file, "log.bin", exdir = tempdir())
-    log  <- parse_log_bin(
-      log_file, file_3x["log.bin", "Length"], info, tz,
-      verbose, include
+      }
+
+    }
+
+
+  ## Run extra checks if requested and applicable
+
+    if (!is.null(log$RAW$Timestamp) & data_checks) {
+
+      if (verbose) cat("\n  Running some extra data checks")
+
+      if (anyDuplicated(log$RAW$Timestamp)) warning(
+        "Duplicated timestamps in the data. This usually indicates an error",
+        call. = FALSE
+      )
+
+      if (any(.accel_names %in% names(log$RAW))) {
+
+        intersect(.accel_names, names(log$RAW)) %>%
+        log$RAW[ ,.] %>%
+        abs(.) %>%
+        {. > .odd_value_threshold} %>%
+        any(.) %>%
+        {if (.) warning(
+          "Data values outside of ", .odd_value_threshold,
+          " threshold, this usually indicates an error",
+          call. = FALSE
+        )}
+
+      }
+
+      if (verbose) cat("Checking............. COMPLETE")
+
+    }
+
+
+  ## Run cleanup procedures if requested
+
+    if (cleanup) {
+
+      if (verbose) cat("\n\n  Cleaning up")
+
+      remove_file <- attr(file$path, "remove")
+
+      if (remove_file) {
+        file.remove(file$path)
+      }
+
+      tempdir() %>%
+        file.path("log.bin") %>%
+        file.remove(.)
+
+      if (verbose) cat("  ............. COMPLETE")
+
+    }
+
+  ## Return
+
+    PAutilities::manage_procedure(
+      "End", "\n\nProcessing complete. Elapsed time",
+      PAutilities::get_duration(timer),
+      "minutes.\n", verbose = verbose
     )
 
-  PAutilities::manage_procedure(
-    "End", "\n\nProcessing complete. Elapsed time",
-    PAutilities::get_duration(timer),
-    "minutes.\n", verbose = verbose
-  )
 
-  return(log)
+    return(log)
 
 }

@@ -4,9 +4,15 @@
 \alias{read_AG_IMU}
 \title{File reading function for IMU files}
 \usage{
-read_AG_IMU(file, output_window_secs = 1, verbose = FALSE, skip = 10,
-  filter = TRUE, filter_hz = 35, output_vars = c("accelerometer",
-  "temperature", "gyroscope", "magnetometer"), return_raw = FALSE)
+read_AG_IMU(
+  file,
+  output_window_secs = 1,
+  verbose = FALSE,
+  filter = TRUE,
+  filter_hz = 35,
+  output_vars = c("accelerometer", "temperature", "gyroscope", "magnetometer"),
+  return_raw = FALSE
+)
 }
 \arguments{
 \item{file}{character scalar giving the path to the IMU file}
@@ -14,8 +20,6 @@ read_AG_IMU(file, output_window_secs = 1, verbose = FALSE, skip = 10,
 \item{output_window_secs}{the desired epoch length; defaults to one second}
 
 \item{verbose}{A logical scalar: Print processing updates?}
-
-\item{skip}{Header length: Number of rows to skip when reading the file}
 
 \item{filter}{a logical scalar: Apply a low-pass filter to gyroscope data?}
 
